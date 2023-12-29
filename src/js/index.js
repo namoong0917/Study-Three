@@ -37,4 +37,22 @@ const material = new THREE.MeshStandardMaterial({
 });
 const box = new THREE.Mesh(geometry, material);
 scene.add(box); // 화면에 box 보여주기
-renderer.render(scene, camera);
+
+function animate() {
+  // box.rotation.y += 0.01;
+  console.log(box.rotation.y);
+  renderer.render(scene, camera);
+  // THREE.js 애니메이션 표현
+  requestAnimationFrame(animate);
+}
+animate();
+
+// 반응형
+window.addEventListener("resize", () => {
+  // 1. 카메라의 종횡비
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix(); // 카메라 업데이트
+
+  // 2. 렌더러의 크기
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
