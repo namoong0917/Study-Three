@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
 const $result = document.getElementById("result");
 
@@ -9,24 +10,33 @@ scene.background = new THREE.Color(0xffe287); // scene은 기본값이 검정이
 // scene.add(요소);
 
 // 배경
-const loader = new THREE.TextureLoader();
-const texture = loader.load(
-  "../../src/data/blaubeuren_church_square.jpg",
-  () => {
-    const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-    rt.fromEquirectangularTexture(renderer, texture);
-    scene.background = rt.texture;
-  }
-);
+new RGBELoader()
+  .setPath("../../src/data/")
+  .load("blaubeuren_church_square_4k.hdr", function (texture) {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = texture;
+  });
+
+// const loader = new RGBELoader();
+// const texture = loader.load(
+//   "../../src/data/blaubeuren_church_square_4k.hdr",
+//   () => {
+//     const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
+//     rt.fromEquirectangularTexture(renderer, texture);
+//     scene.background = rt.texture;
+//     scene.enviroment = rt.texture;
+//     // texture.mapping = THREE.EquirectangularReflectionMapping;
+//   }
+// );
 
 // 2. Camera: Scene을 바라볼 시점을 결정
 const camera = new THREE.PerspectiveCamera(
   50, // fov : 시야각, 커질 수록 화면에 많은 영역을 출력 기본값 50,사람의 시야와 유사한 45~75 사이 값 사용
   $result.clientWidth / $result.clientHeight, // aspect 카메라의 종횡비
-  0.1, // near 카메라로 볼 수 있는 최소 거리
+  1, // near 카메라로 볼 수 있는 최소 거리
   1000 // far 카메라로 볼 수 있는 최대 거리
 );
-camera.position.set(2, 2, 2); // 객체 위치 (x, y, z)
+camera.position.set(0, 0, 500); // 객체 위치 (x, y, z)
 camera.lookAt(1, 1, 1); // 바라볼 좌푝값 (x, y, z)
 
 // 3. Renderer: Scene + Camera, 화면을 그려주는 역할
@@ -43,17 +53,21 @@ document.body.appendChild(renderer.domElement); // 캔버스 생성
 renderer.setSize($result.clientWidth, $result.clientHeight);
 
 // 빛 추가
-const light = new THREE.DirectionalLight(0xffffff);
-light.position.set(2, 4, 3);
-scene.add(light);
+// pointLight = new THREE.PointLight(0xffffff, 1);
+// pointLight.position.set(200, 200, 200);
+// scene.add(pointLight);
+
+// const light = new THREE.DirectionalLight(0xffffff);
+// light.position.set(2, 4, 3);
+// scene.add(light);
 
 // 예시 도형
-const geometry = new THREE.SphereGeometry(1, 64, 32);
+const ballGeo = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
-  metalness: 0.1,
-  roughness: 0.05,
-  // ior: 1.7, // 굴절률
+  metalness: 0,
+  roughness: 0,
+  ior: 1.7, // 굴절률
   thickness: 0.2, // 두께 (클수록 유리뒷쪽이 왜곡되어보임)
   reflectivity: 1,
   specularIntensity: 1,
@@ -63,10 +77,10 @@ const material = new THREE.MeshPhysicalMaterial({
   transparent: true,
   opacity: 1,
   transmission: 1,
-  // side: THREE.DoubleSide,
+  envMapIntensity: 1,
 });
 console.log(material);
-const won = new THREE.Mesh(geometry, material);
+const won = new THREE.Mesh(ballGeo, material);
 scene.add(won); // 화면에 보여주기
 renderer.render(scene, camera); // scene 과 camera 정보를 담아 화면에 출력 연결
 
