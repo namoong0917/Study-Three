@@ -6,13 +6,13 @@ const $result = document.getElementById("result");
 
 // 1. Scene: 화면에서 보여주려는 객체를 담는 공간
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffe287); // scene은 기본값이 검정이므로 변경
+scene.background = new THREE.Color(0x000000); // scene은 기본값이 검정이므로 변경
 // scene.add(요소);
 
 // 배경
 new RGBELoader()
   .setPath("../../src/data/")
-  .load("blaubeuren_church_square_4k.hdr", function (texture) {
+  .load("wasteland_clouds_puresky_4k.hdr", function (texture) {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = texture;
   });
@@ -33,7 +33,7 @@ new RGBELoader()
 const camera = new THREE.PerspectiveCamera(
   50, // fov : 시야각, 커질 수록 화면에 많은 영역을 출력 기본값 50,사람의 시야와 유사한 45~75 사이 값 사용
   $result.clientWidth / $result.clientHeight, // aspect 카메라의 종횡비
-  1, // near 카메라로 볼 수 있는 최소 거리
+  0.1, // near 카메라로 볼 수 있는 최소 거리
   1000 // far 카메라로 볼 수 있는 최대 거리
 );
 camera.position.set(0, 0, 500); // 객체 위치 (x, y, z)
@@ -88,7 +88,7 @@ renderer.render(scene, camera); // scene 과 camera 정보를 담아 화면에 �
 // OrbitContorls
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 3;
+controls.minDistance = 0.1;
 controls.maxDistance = 5;
 // controls.maxPolarAngle = Math.PI / 3;
 
