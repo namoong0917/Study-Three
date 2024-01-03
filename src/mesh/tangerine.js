@@ -6,8 +6,21 @@ export default function printTangerine() {
   const body = new THREE.Group();
 
   // 한라봉
+  // 한라봉 텍스처 loader
+  const loader = new THREE.TextureLoader();
+  // 재질에 적용할 텍스처 객체
+  const basecolor = loader.load(
+    "../../src/textures/orange/Orange_001_COLOR.jpg"
+  );
+  const normal = loader.load("../../src/textures/orange/Orange_001_NORM.jpg");
+  const rough = loader.load("../../src/textures/orange/Orange_001_ROUGH.jpg");
+
   const bodyMaterial = new THREE.MeshStandardMaterial({
-    color: 0xff7f00,
+    color: 0xffb48c,
+    map: basecolor, // 색상을 나타내는 텍스처
+    normalMap: normal, // 빛의 왜곡 효과
+    roughness: 0.2,
+    roughnessMap: rough, // 현실감있는 재질 표현
     // wireframe: true,
   });
   const bottomGeometry = new THREE.DodecahedronGeometry(2, 1);
@@ -22,7 +35,7 @@ export default function printTangerine() {
 
   const leaves = new THREE.Group(); // 꼭따리 그룹화
   const leafMaterial = new THREE.MeshStandardMaterial({
-    color: 0x008000,
+    color: 0x6ca06e,
     side: THREE.DoubleSide, // 양면 활용
   });
 

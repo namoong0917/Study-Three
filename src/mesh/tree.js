@@ -2,14 +2,25 @@ import * as THREE from "three";
 
 export default function printTree() {
   // 나무
+  // 나무 텍스처 loader
+  const loader = new THREE.TextureLoader();
+  const basecolor = loader.load("../../src/textures/wood/wood_basecolor.jpg");
+  const nomal = loader.load("../../src/textures/wood/wood_normal.jpg");
+  const rough = loader.load("../../src/textures/wood/wood_roughness.jpg");
+  const height = loader.load("../../src/textures/wood/wood_height.png");
 
   // 그룹 만들기
   const trunk = new THREE.Group();
   // 나무와 나뭇잎 그룹 설정
   const tree = new THREE.Group();
 
+  // 나무줄기 Material
   const trunkMaterial = new THREE.MeshStandardMaterial({
     color: 0xa38049,
+    map: basecolor, // 텍스처 연결
+    normalMap: nomal,
+    roughnessMap: rough,
+    // displacementMap: height,
   });
   const trunkGeometry = new THREE.CylinderGeometry(0.8, 1, 1.5);
   const trunk1 = new THREE.Mesh(trunkGeometry, trunkMaterial);
@@ -38,11 +49,16 @@ export default function printTree() {
   // trunk를 tree 그룹에 추가
   tree.add(trunk);
 
+  // 나뭇잎 텍스처
+  const leafTexture = loader.load("../../src/textures/leaf/leaf_texture.png");
+
   const leaf = new THREE.Group(); // 나뭇잎 그룹 만들기
   // 나뭇잎
   const leafMaterial = new THREE.MeshStandardMaterial({
     color: 0x84ad88,
     side: THREE.DoubleSide,
+    map: leafTexture,
+    transparent: true, // png 에서 투명한 부분을 살리고 싶을 때
   });
   const leafGeometry = new THREE.SphereGeometry(
     2,
