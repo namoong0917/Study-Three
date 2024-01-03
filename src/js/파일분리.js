@@ -45,7 +45,7 @@ tangerine1.position.x = 3; // tangerine1 x 위치 조작
 tangerine1.scale.set(0.8, 0.8, 0.8); // tangerine1 크기 조작
 scene.add(tangerine1);
 
-// x y z 축 보이기
+// x적 y녹 z파 축 보이기
 const axes = new THREE.AxesHelper(10);
 scene.add(axes);
 
