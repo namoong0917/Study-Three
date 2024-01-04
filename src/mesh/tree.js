@@ -102,5 +102,13 @@ export default function printTree() {
   // tree 옮기기
   // tree.position.x = 2;
 
+  // 그림자 속성
+  for (const mesh of trunk.children) {
+    mesh.castShadow = true;
+  }
+  for (const mesh of leaf.children) {
+    mesh.castShadow = true;
+  }
+
   return tree;
 }

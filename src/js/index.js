@@ -1,111 +1,132 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+import printIsland from "../mesh/island.js";
+import printTangerine from "../mesh/tangerine.js";
+import printTree from "../mesh/tree.js";
+import printMountain from "../mesh/mountain.js";
+import printStone from "../mesh/stone.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-const $result = document.getElementById("result");
-
-// 1. Scene: 화면에서 보여주려는 객체를 담는 공간
+// 장면구조
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000); // scene은 기본값이 검정이므로 변경
-// scene.add(요소);
+scene.background = new THREE.Color(0x7ccad5);
 
-// 2. Camera: Scene을 바라볼 시점을 결정
 const camera = new THREE.PerspectiveCamera(
-  50, // fov : 시야각, 커질 수록 화면에 많은 영역을 출력 기본값 50,사람의 시야와 유사한 45~75 사이 값 사용
-  $result.clientWidth / $result.clientHeight, // aspect 카메라의 종횡비
-  0.1, // near 카메라로 볼 수 있는 최소 거리
-  1000 // far 카메라로 볼 수 있는 최대 거리
+  50,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
 );
-camera.position.set(0, 0, 500); // 객체 위치 (x, y, z)
-camera.lookAt(1, 1, 1); // 바라볼 좌푝값 (x, y, z)
+camera.position.set(0, 15, 15);
+camera.lookAt(0, 0, 0);
 
-// 3. Renderer: Scene + Camera, 화면을 그려주는 역할
-// 원하는곳에 canvas를 출력하기위해 WebGLRenderer() 안에 속성값으로
-// { canvas: 선택한 돔 요소 } 를 넣어준다.
-// antialias: true : 계단현상 안티엘리징
-const renderer = new THREE.WebGLRenderer({
-  canvas: $result,
-  antialias: true,
-});
+const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
-// console.log(renderer);
-document.body.appendChild(renderer.domElement); // 캔버스 생성
-renderer.setSize($result.clientWidth, $result.clientHeight);
+document.body.appendChild(renderer.domElement);
 
-// 빛 추가
-// pointLight = new THREE.PointLight(0xffffff, 1);
-// pointLight.position.set(200, 200, 200);
-// scene.add(pointLight);
+// 그림자
+renderer.shadowMap.enabled = true;
 
-// const light = new THREE.DirectionalLight(0xffffff);
-// light.position.set(2, 4, 3);
-// scene.add(light);
+// 처음 시작 기본 도형
+// const geo = new THREE.BoxGeometry(1, 1, 1);
+// const material = new THREE.MeshStandardMaterial({
+//   color: 0xffe272,
+// });
+// const mesh = new THREE.Mesh(geo, material);
+// scene.add(mesh);
 
-// 예시 도형
-const ballGeo = new THREE.SphereGeometry(1, 64, 32);
-const material = new THREE.MeshPhysicalMaterial({
-  color: 0xffffff,
-  metalness: 0,
-  roughness: 0,
-  ior: 1.7, // 굴절률
-  thickness: 0.2, // 두께 (클수록 유리뒷쪽이 왜곡되어보임)
-  reflectivity: 1,
-  specularIntensity: 1,
+// 섬
+const island = printIsland();
+scene.add(island);
 
-  // wireframe: true,
+// 한라봉
+const tangerine = printTangerine();
+tangerine.position.set(-5, 1, -1);
+scene.add(tangerine);
 
-  transparent: true,
-  opacity: 1,
-  transmission: 1,
-  envMapIntensity: 1,
+const miniTan = printTangerine();
+miniTan.scale.set(0.7, 0.7, 0.7);
+miniTan.position.set(-6, 0.4, 1.5);
+scene.add(miniTan);
+// console.log(miniTan);
+
+// 나무
+const tree = printTree();
+tree.position.set(5, -0.5, -1);
+tree.rotation.y = Math.PI / -3;
+scene.add(tree);
+
+const miniTree = printTree();
+miniTree.position.set(6.5, -0.5, 1);
+miniTree.scale.set(0.6, 0.6, 0.6);
+scene.add(miniTree);
+
+// 산
+const mountain = printMountain();
+mountain.scale.set(1.2, 1.6, 1);
+mountain.position.set(0, 2.3, -1.8);
+scene.add(mountain);
+
+const myChar = printStone();
+myChar.position.set(3, -0.5, 1);
+myChar.scale.set(0.9, 0.9, 0.9);
+myChar.rotation.y = Math.PI / -8;
+scene.add(myChar);
+
+// 외부 모델
+const modelLoader = new GLTFLoader().setPath("../../src/models/");
+modelLoader.load("furry_ball_2_electric_boogaloo_real_fur_test.glb", (gltf) => {
+  const model = gltf.scene;
+  model.position.set(-2.8, 0.6, 1);
+  model.rotation.y = Math.PI / 8;
+  scene.add(model);
+  // 외부 모델에 그림자
+  // console.log(model);
+  // model.castShadow = true;
+  // model.receiveShadow = true;
+  for (const mesh of model.children) {
+    // 그림자를 만드는 mesh에는 castShadow를 사용하며
+    // 그림자를 받는 mesh에는 receiveShadow을 이용
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+  }
 });
-console.log(material);
-const won = new THREE.Mesh(ballGeo, material);
-scene.add(won); // 화면에 보여주기
-renderer.render(scene, camera); // scene 과 camera 정보를 담아 화면에 출력 연결
 
-// 배경 관리
-const loader = new RGBELoader().setPath("../../src/data/");
-// 배경
-const bgTexture = loader.load("fireplace_4k.hdr", () => {
-  const rt = new THREE.WebGLCubeRenderTarget(bgTexture.image.height);
-  rt.fromEquirectangularTexture(renderer, bgTexture);
-  scene.background = rt.texture;
-});
-// 도형 반사
-loader.load("fireplace_4k.hdr", function (texture) {
-  texture.mapping = THREE.EquirectangularReflectionMapping;
-  scene.environment = texture;
-});
+// 빛
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
 
-// 움직이게 하기
-// OrbitContorls
-const controls = new OrbitControls(camera, renderer.domElement);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(2, 1, 2);
+scene.add(directionalLight);
+// 그림자 적용 시킬 빛에 설정
+directionalLight.castShadow = true;
 
-controls.minDistance = 1;
-controls.maxDistance = 8;
-// controls.maxPolarAngle = Math.PI / 3;
+const pl1 = new THREE.PointLight(0xff8c00, 1.5);
+pl1.position.set(5, 0, 0);
+scene.add(pl1);
 
-controls.autoRotate = true;
-controls.autoRotateSpeed = 1;
+const pl2 = new THREE.PointLight(0xffe287, 2);
+pl2.position.set(-3, 2, 0);
+scene.add(pl2);
 
-controls.enableDamping = true;
+// OrbitControls
+const control = new OrbitControls(camera, renderer.domElement);
+control.autoRotate = true;
+control.autoRotateSpeed = -1;
+control.minDistance = 10;
+control.maxDistance = 30;
 
 function animate() {
-  controls.update();
-  // console.log(won.rotation.y);
+  control.update();
   renderer.render(scene, camera);
-  // THREE.js 애니메이션 표현
+
   requestAnimationFrame(animate);
 }
 animate();
 
-// 반응형
 window.addEventListener("resize", () => {
-  // 1. 카메라의 종횡비
   camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix(); // 카메라 속성 업데이트
-
-  // 2. 렌더러의 크기
+  camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });

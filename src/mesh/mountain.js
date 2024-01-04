@@ -6,7 +6,7 @@ export default function printMountain() {
   const side = loader.load("../../src/textures/mountain/mountain.jpg");
 
   const geometry = new THREE.CylinderGeometry(1, 3, 3, 8);
-  const material = new THREE.MeshStandardMaterial({ color: 0xffaaaa });
+  // const material = new THREE.MeshStandardMaterial({ color: 0xffaaaa });
   const materials = [
     new THREE.MeshStandardMaterial({
       // color: 0xff0000,
@@ -19,6 +19,10 @@ export default function printMountain() {
     new THREE.MeshStandardMaterial({ color: 0x609966 }),
   ];
   const mountain = new THREE.Mesh(geometry, materials);
+
+  //그림자 속성 적용
+  mountain.castShadow = true;
+  mountain.receiveShadow = true;
 
   return mountain;
 }

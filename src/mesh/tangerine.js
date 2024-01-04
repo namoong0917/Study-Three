@@ -53,6 +53,15 @@ export default function printTangerine() {
   leaves.add(leaf);
 
   tangerine.add(body, leaves);
+  // 그림자 적용
+  for (const mesh of body.children) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+  }
+  for (const mesh of leaves.children) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+  }
 
   return tangerine;
 }
