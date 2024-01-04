@@ -9,26 +9,6 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000); // scene은 기본값이 검정이므로 변경
 // scene.add(요소);
 
-// 배경
-new RGBELoader()
-  .setPath("../../src/data/")
-  .load("wasteland_clouds_puresky_4k.hdr", function (texture) {
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-    scene.environment = texture;
-  });
-
-// const loader = new RGBELoader();
-// const texture = loader.load(
-//   "../../src/data/blaubeuren_church_square_4k.hdr",
-//   () => {
-//     const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
-//     rt.fromEquirectangularTexture(renderer, texture);
-//     scene.background = rt.texture;
-//     scene.enviroment = rt.texture;
-//     // texture.mapping = THREE.EquirectangularReflectionMapping;
-//   }
-// );
-
 // 2. Camera: Scene을 바라볼 시점을 결정
 const camera = new THREE.PerspectiveCamera(
   50, // fov : 시야각, 커질 수록 화면에 많은 영역을 출력 기본값 50,사람의 시야와 유사한 45~75 사이 값 사용
@@ -84,12 +64,26 @@ const won = new THREE.Mesh(ballGeo, material);
 scene.add(won); // 화면에 보여주기
 renderer.render(scene, camera); // scene 과 camera 정보를 담아 화면에 출력 연결
 
+// 배경 관리
+const loader = new RGBELoader().setPath("../../src/data/");
+// 배경
+const bgTexture = loader.load("fireplace_4k.hdr", () => {
+  const rt = new THREE.WebGLCubeRenderTarget(bgTexture.image.height);
+  rt.fromEquirectangularTexture(renderer, bgTexture);
+  scene.background = rt.texture;
+});
+// 도형 반사
+loader.load("fireplace_4k.hdr", function (texture) {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.environment = texture;
+});
+
 // 움직이게 하기
 // OrbitContorls
 const controls = new OrbitControls(camera, renderer.domElement);
 
-controls.minDistance = 0.1;
-controls.maxDistance = 5;
+controls.minDistance = 1;
+controls.maxDistance = 8;
 // controls.maxPolarAngle = Math.PI / 3;
 
 controls.autoRotate = true;
